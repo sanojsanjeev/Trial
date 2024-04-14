@@ -1,0 +1,34 @@
+#include <LPC23xx.H>                   
+#include "adc.h"
+
+// Function to initialize the ADC
+void adc_init(void) { 
+    // To enable the ADC, set the PCADC bit in the PCONP register
+    PCONP |= (1 << 12);                // Enable ADC power
+    
+    // Enable P0.23 pin as AD0.0
+    PINSEL1 |= (1 << 14);               // Select AD0.0 for pin P0.23
+    PINSEL1 &= ~(1 << 15);              // Clear bits to ensure proper selection
+    
+    AD0INTEN |= (1 << 1);               // Enable ADC interrupt for channel 1
+    
+    // Configure ADC control register (AD0CR) settings
+    AD0CR &= ~(1 << 0);                 // Clear SEL field to select AD0.0 channel
+    AD0CR |= (1 << 0);                  // Set SEL to select AD0.0 channel
+    AD0CR |= (1 << 9);                  // Set clock for A/D to 4 MHz
+    AD0CR |= (1 << 16);                 // Enable Burst Mode for continuous conversions
+    AD0CR |= (1 << 21);                 // Enable ADC converter operation
+}
+
+// Function to convert ADC converted value to voltage in volts
+float adc_output_voltage(int adc_output) {
+    float voltage;
+    // Wait until conversion is complete by checking the DONE bit in AD0STAT register
+    while (!(AD0STAT & (1 << 0)));
+    // Read converted ADC data from AD0DR0 register and extract ADC value
+    adc_output = (AD0DR0 & 0x0000FFC0);    // Masking bits to extract ADC value
+    adc_output = adc_output >> 6;              // Shifting to get the actual ADC value
+    // Convert ADC value to voltage using the formula: voltage = (adcdata / 1024) * 3.3
+    voltage = ((float)adc_output / 1024.0) * 3.3; // Convert ADC value to voltage in millivolts
+    return voltage;
+}
