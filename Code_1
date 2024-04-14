@@ -1,0 +1,57 @@
+
+
+#include <stdio.h>
+#include <LPC23xx.H>                    
+#include "LCD.h"                        
+#include "adc.h"  
+
+// Function prototypes
+void delay(void);                       // Function to introduce delay
+
+float pot_output;                          // Variable to store voltage value
+int adc_output;                            // Variable to store ADC data
+char volt[10];                             // Array to store voltage as string
+
+int main() {
+   
+    lcd_init();                         // Initialize LCD
+    adc_init();                         // Initialize ADC
+    lcd_clear();                        // Clear LCD screen
+    
+    // Display BITS ID
+    set_cursor (0, 0);
+    lcd_print ("2023HT01504");         
+   
+   // Display date
+    set_cursor (9, 1);
+    lcd_print ("15/4");                 
+
+    // ADC read and display
+   
+        pot_output = adc_output_voltage(adc_output); // Read ADC value and convert to voltage
+        
+        // Convert voltage to string
+        sprintf(volt,"%g",pot_output);
+        
+        // Display voltage on LCD
+        set_cursor (0, 1);
+        lcd_print (volt);
+        
+        // Introduce a delay
+        delay();
+    
+}
+
+// Function to introduce delay
+void delay(void) {
+    int i, j;
+    for(i = 0; i < 1000; i++) {
+        for(j = 0; j < 10000; j++) {
+            // Loop to create delay
+        }
+    }
+}
+
+
+
+
